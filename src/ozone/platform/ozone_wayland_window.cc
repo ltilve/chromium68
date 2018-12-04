@@ -109,7 +109,7 @@ OzoneWaylandWindow::OzoneWaylandWindow(PlatformWindowDelegate* delegate,
   static int opaque_handle = 0;
   opaque_handle++;
   handle_ = opaque_handle;
-  delegate_->OnAcceleratedWidgetAvailable(opaque_handle, 1.0);
+  delegate_->OnAcceleratedWidgetAvailable(opaque_handle);
 
   PlatformEventSource::GetInstance()->AddPlatformEventDispatcher(this);
   sender_->AddChannelObserver(this);
