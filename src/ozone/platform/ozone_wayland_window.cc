@@ -109,7 +109,7 @@ OzoneWaylandWindow::OzoneWaylandWindow(PlatformWindowDelegate* delegate,
   static int opaque_handle = 0;
   opaque_handle++;
   handle_ = opaque_handle;
-  delegate_->OnAcceleratedWidgetAvailable(opaque_handle, 1.0);
+  delegate_->OnAcceleratedWidgetAvailable(opaque_handle);
 
   PlatformEventSource::GetInstance()->AddPlatformEventDispatcher(this);
   sender_->AddChannelObserver(this);
@@ -444,6 +444,12 @@ void OzoneWaylandWindow::ValidateBounds() {
 
 PlatformImeController* OzoneWaylandWindow::GetPlatformImeController() {
   return nullptr;
+}
+
+void OzoneWaylandWindow::SetRestoredBoundsInPixels(const gfx::Rect& bounds) {}
+
+gfx::Rect OzoneWaylandWindow::GetRestoredBoundsInPixels() const {
+  return gfx::Rect();
 }
 
 void OzoneWaylandWindow::SetWindowProperty(const std::string& name,
