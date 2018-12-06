@@ -15,7 +15,7 @@ WaylandScreen::WaylandScreen(wl_registry* registry, uint32_t id)
     : output_(NULL), rect_(0, 0, 0, 0) {
   static const wl_output_listener kOutputListener = {
       WaylandScreen::OutputHandleGeometry, WaylandScreen::OutputHandleMode,
-      WaylandScreen::OutputDone,
+      WaylandScreen::OutputDone, WaylandScreen::OutputScale
   };
 
   output_ = static_cast<wl_output*>(
@@ -100,6 +100,11 @@ void WaylandScreen::OutputDone(void* data, struct wl_output* wl_output) {
       WaylandDisplay::GetInstance()->OutputScreenChanged(width, height,
                                                          rotation);
   }
+}
+
+// static
+void WaylandScreen::OutputScale(void *data, struct wl_output *wl_output, int32_t factor) {
+  NOTIMPLEMENTED_LOG_ONCE();
 }
 
 }  // namespace ozonewayland
