@@ -122,6 +122,11 @@ class OzonePlatformWayland : public OzonePlatform {
     return connection_->wayland_output_manager()->CreateWaylandScreen();
   }
 
+  PlatformClipboard* GetPlatformClipboard() override {
+    DCHECK(connection_);
+    return connection_->GetPlatformClipboard();
+  }
+
   bool IsNativePixmapConfigSupported(gfx::BufferFormat format,
                                      gfx::BufferUsage usage) const override {
     // If there is no drm render node device available, native pixmaps are not

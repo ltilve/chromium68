@@ -23,8 +23,8 @@
 #include "ui/ozone/platform/wayland/wayland_output.h"
 #include "ui/ozone/platform/wayland/wayland_pointer.h"
 #include "ui/ozone/platform/wayland/wayland_touch.h"
-#include "ui/ozone/public/clipboard_delegate.h"
 #include "ui/ozone/public/interfaces/wayland/wayland_connection.mojom.h"
+#include "ui/ozone/public/platform_clipboard.h"
 
 namespace ui {
 
@@ -36,8 +36,9 @@ class WaylandBufferManager;
 class WaylandFdWatcherGlib;
 #endif
 
+// TODO: factor out PlatformClipboard to a separate class.
 class WaylandConnection : public PlatformEventSource,
-                          public ClipboardDelegate,
+                          public PlatformClipboard,
                           public ozone::mojom::WaylandConnection,
                           public base::MessagePumpLibevent::FdWatcher {
  public:
@@ -112,21 +113,21 @@ class WaylandConnection : public PlatformEventSource,
   }
 
   // Clipboard implementation.
-  ClipboardDelegate* GetClipboardDelegate();
+  PlatformClipboard* GetPlatformClipboard();
   void DataSourceCancelled();
   void SetClipboardData(const std::string& contents,
                         const std::string& mime_type);
 
-  // ClipboardDelegate.
+  // PlatformClipboard.
   void OfferClipboardData(
-      const ClipboardDelegate::DataMap& data_map,
-      ClipboardDelegate::OfferDataClosure callback) override;
+      const PlatformClipboard::DataMap& data_map,
+      PlatformClipboard::OfferDataClosure callback) override;
   void RequestClipboardData(
       const std::string& mime_type,
-      ClipboardDelegate::DataMap* data_map,
-      ClipboardDelegate::RequestDataClosure callback) override;
+      PlatformClipboard::DataMap* data_map,
+      PlatformClipboard::RequestDataClosure callback) override;
   void GetAvailableMimeTypes(
-      ClipboardDelegate::GetMimeTypesClosure callback) override;
+      PlatformClipboard::GetMimeTypesClosure callback) override;
   bool IsSelectionOwner() override;
 
   // Returns bound pointer to own mojo interface.
@@ -241,7 +242,7 @@ class WaylandConnection : public PlatformEventSource,
 
   // Holds a temporary instance of the client's clipboard content
   // so that we can asynchronously write to it.
-  ClipboardDelegate::DataMap* data_map_ = nullptr;
+  PlatformClipboard::DataMap* data_map_ = nullptr;
 
   // Stores the callback to be invoked upon data reading from clipboard.
   RequestDataClosure read_clipboard_closure_;
