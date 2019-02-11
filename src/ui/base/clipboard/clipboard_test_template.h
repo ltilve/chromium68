@@ -185,8 +185,8 @@ TYPED_TEST(ClipboardTest, RTFTest) {
   EXPECT_EQ(rtf, result);
 }
 
-// TODO(dnicoara) Enable test once Ozone implements clipboard support:
-// crbug.com/361707
+// TODO(msisov, tonikitoo): Enable test once ClipboardOzone implements
+// selection support. https://crbug.com/911992
 #if defined(OS_LINUX) && !defined(OS_CHROMEOS) && !defined(USE_OZONE)
 TYPED_TEST(ClipboardTest, MultipleBufferTest) {
   base::string16 text(ASCIIToUTF16("Standard")), text_result;
@@ -372,8 +372,10 @@ TYPED_TEST(ClipboardTest, URLTest) {
   this->clipboard().ReadAsciiText(CLIPBOARD_TYPE_COPY_PASTE, &ascii_text);
   EXPECT_EQ(UTF16ToUTF8(url), ascii_text);
 
+// TODO(tonikitoo, msisov): enable back for ClipboardOzone implements
+// selection support. https://crbug.com/911992
 #if defined(OS_POSIX) && !defined(OS_MACOSX) && !defined(OS_ANDROID) && \
-    !defined(OS_CHROMEOS)
+    !defined(OS_CHROMEOS) && !defined(USE_OZONE)
   if (!this->IsMusTest()) {
     ascii_text.clear();
     this->clipboard().ReadAsciiText(CLIPBOARD_TYPE_SELECTION, &ascii_text);

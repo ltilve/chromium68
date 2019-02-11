@@ -245,6 +245,13 @@ bool WaylandConnection::IsSelectionOwner() {
   return !!data_source_;
 }
 
+void WaylandConnection::SetSequenceNumberUpdateCb(
+    PlatformClipboard::SequenceNumberUpdateCb cb) {
+  CHECK(update_sequence_cb_.is_null())
+      << " The callback can be installed only once.";
+  update_sequence_cb_ = std::move(cb);
+}
+
 ozone::mojom::WaylandConnectionPtr WaylandConnection::BindInterface() {
   // This mustn't be called twice or when the zwp_linux_dmabuf interface is not
   // available.
@@ -324,6 +331,11 @@ void WaylandConnection::SetClipboardData(const std::string& contents,
     std::move(read_clipboard_closure_).Run(it->second);
   }
   data_map_ = nullptr;
+}
+
+void WaylandConnection::UpdateClipboardSequenceNumber() {
+  if (!update_sequence_cb_.is_null())
+    update_sequence_cb_.Run();
 }
 
 void WaylandConnection::OnDispatcherListChanged() {
