@@ -111,6 +111,8 @@ class WaylandConnection : public PlatformEventSource,
     return wayland_output_manager_.get();
   }
 
+  WaylandBufferManager* buffer_manager() const { return buffer_manager_.get(); }
+
   // Clipboard implementation.
   ClipboardDelegate* GetClipboardDelegate();
   void DataSourceCancelled();
