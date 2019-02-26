@@ -28,6 +28,7 @@
 
 namespace ui {
 
+class WaylandShmBufferManager;
 class WaylandOutputManager;
 class WaylandWindow;
 class WaylandBufferManager;
@@ -49,7 +50,8 @@ class WaylandConnection : public PlatformEventSource,
 
   // ozone::mojom::WaylandConnection overrides:
   //
-  // These overridden methods below are invoked by the GPU.
+  // These overridden methods below are invoked by the GPU when hardware
+  // accelerated rendering is used.
   //
   // Called by the GPU and asks to import a wl_buffer based on a gbm file
   // descriptor.
@@ -70,6 +72,16 @@ class WaylandConnection : public PlatformEventSource,
                           uint32_t buffer_id,
                           const gfx::Rect& damage_region,
                           ScheduleBufferSwapCallback callback) override;
+  // These overridden methods below are invoked by the GPU when hardware
+  // accelerated rendering is not used. Check comments in the
+  // ui/ozone/public/interfaces/wayland/wayland_connection.mojom.
+  void CreateShmBufferForWidget(gfx::AcceleratedWidget widget,
+                                base::File file,
+                                uint64_t length,
+                                const gfx::Size& size) override;
+  void PresentShmBufferForWidget(gfx::AcceleratedWidget widget,
+                                 const gfx::Rect& damage) override;
+  void DestroyShmBuffer(gfx::AcceleratedWidget widget) override;
 
   // Schedules a flush of the Wayland connection.
   void ScheduleFlush();
@@ -224,6 +236,7 @@ class WaylandConnection : public PlatformEventSource,
   std::unique_ptr<WaylandKeyboard> keyboard_;
   std::unique_ptr<WaylandOutputManager> wayland_output_manager_;
   std::unique_ptr<WaylandPointer> pointer_;
+  std::unique_ptr<WaylandShmBufferManager> shm_buffer_manager_;
   std::unique_ptr<WaylandTouch> touch_;
 
   // Objects that are using when GPU runs in own process.
