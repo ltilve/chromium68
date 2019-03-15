@@ -6,7 +6,10 @@
 #define UI_OZONE_PLATFORM_WAYLAND_WAYLAND_CONNECTION_H_
 
 #include <map>
-
+#include <memory>
+#include <string>
+#include <vector>
+ 
 #include <ivi-application-client-protocol.h>
 
 #include "base/files/file.h"
@@ -39,6 +42,7 @@ class WaylandBufferManager;
 class WaylandFdWatcherGlib;
 #endif
 
+// TODO(crbug.com/942203): factor out PlatformClipboard to a separate class.
 class WaylandConnection : public PlatformEventSource,
                           public ClipboardDelegate,
                           public ozone::mojom::WaylandConnection,
@@ -108,7 +112,9 @@ class WaylandConnection : public PlatformEventSource,
   // Returns the current pointer, which may be null.
   WaylandPointer* pointer() { return pointer_.get(); }
 
-  WaylandDataSource* drag_data_source() { return drag_data_source_.get(); }
+  WaylandDataSource* drag_data_source() {
+    return dragdrop_data_source_.get();
+  }
 
   WaylandOutputManager* wayland_output_manager() const {
     return wayland_output_manager_.get();
@@ -234,8 +240,8 @@ class WaylandConnection : public PlatformEventSource,
 
   std::unique_ptr<WaylandDataDeviceManager> data_device_manager_;
   std::unique_ptr<WaylandDataDevice> data_device_;
-  std::unique_ptr<WaylandDataSource> data_source_;
-  std::unique_ptr<WaylandDataSource> drag_data_source_;
+  std::unique_ptr<WaylandDataSource> clipboard_data_source_;
+  std::unique_ptr<WaylandDataSource> dragdrop_data_source_;
   std::unique_ptr<WaylandKeyboard> keyboard_;
   std::unique_ptr<WaylandOutputManager> wayland_output_manager_;
   std::unique_ptr<WaylandPointer> pointer_;
