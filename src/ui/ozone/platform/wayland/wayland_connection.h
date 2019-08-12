@@ -116,7 +116,6 @@ class WaylandConnection : public PlatformEventSource,
   void DataSourceCancelled();
   void SetClipboardData(const std::string& contents,
                         const std::string& mime_type);
-  void UpdateClipboardSequenceNumber();
 
   // ClipboardDelegate.
   void OfferClipboardData(
@@ -129,8 +128,6 @@ class WaylandConnection : public PlatformEventSource,
   void GetAvailableMimeTypes(
       ClipboardDelegate::GetMimeTypesClosure callback) override;
   bool IsSelectionOwner() override;
-  void SetSequenceNumberUpdateCb(
-      PlatformClipboard::SequenceNumberUpdateCb cb) override;
 
   // Returns bound pointer to own mojo interface.
   ozone::mojom::WaylandConnectionPtr BindInterface();
@@ -245,10 +242,6 @@ class WaylandConnection : public PlatformEventSource,
   // Holds a temporary instance of the client's clipboard content
   // so that we can asynchronously write to it.
   ClipboardDelegate::DataMap* data_map_ = nullptr;
-
-  // Notifies whenever clipboard sequence number is changed. Can be empty if not
-  // set.
-  PlatformClipboard::SequenceNumberUpdateCb update_sequence_cb_;
 
   // Stores the callback to be invoked upon data reading from clipboard.
   RequestDataClosure read_clipboard_closure_;
