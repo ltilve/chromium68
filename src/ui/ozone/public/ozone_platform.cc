@@ -114,11 +114,6 @@ void OzonePlatform::RegisterStartupCallback(
   std::move(callback).Run(inst);
 }
 
-PlatformClipboard* OzonePlatform::GetPlatformClipboard() {
-  // Platforms that support system clipboard must override this method.
-  return nullptr;
-}
-
 bool OzonePlatform::IsNativePixmapConfigSupported(
     gfx::BufferFormat format,
     gfx::BufferUsage usage) const {

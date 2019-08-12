@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UI_OZONE_PUBLIC_PLATFORM_CLIPBOARD_H_
-#define UI_OZONE_PUBLIC_PLATFORM_CLIPBOARD_H_
+#ifndef UI_OZONE_PUBLIC_CLIPBOARD_DELEGATE_H_
+#define UI_OZONE_PUBLIC_CLIPBOARD_DELEGATE_H_
 
 #include <string>
 #include <unordered_map>
@@ -15,11 +15,11 @@
 
 namespace ui {
 
-// PlatformClipboard is an interface that allows Ozone backends to exchange
+// ClipboardDelegate is an interface that allows Ozone backends to exchange
 // data with other applications on the host system. The most familiar use for
 // it is handling copy and paste operations.
 //
-class OZONE_BASE_EXPORT PlatformClipboard {
+class OZONE_BASE_EXPORT ClipboardDelegate {
  public:
   // DataMap is a map from "mime type" to associated data, whereas
   // the data can be organized differently for each mime type.
@@ -82,4 +82,4 @@ class OZONE_BASE_EXPORT PlatformClipboard {
 
 }  // namespace ui
 
-#endif  // UI_OZONE_PUBLIC_PLATFORM_CLIPBOARD_H_
+#endif  // UI_OZONE_PUBLIC_CLIPBOARD_DELEGATE_H_

@@ -215,13 +215,13 @@ void WaylandConnection::ScheduleBufferSwap(
   }
 }
 
-PlatformClipboard* WaylandConnection::GetPlatformClipboard() {
+ClipboardDelegate* WaylandConnection::GetClipboardDelegate() {
   return this;
 }
 
 void WaylandConnection::OfferClipboardData(
-    const PlatformClipboard::DataMap& data_map,
-    PlatformClipboard::OfferDataClosure callback) {
+    const ClipboardDelegate::DataMap& data_map,
+    ClipboardDelegate::OfferDataClosure callback) {
   if (!data_source_) {
     data_source_ = CreateWaylandDataSource(data_device_manager_.get(), this);
     data_source_->WriteToClipboard(data_map);
@@ -232,8 +232,8 @@ void WaylandConnection::OfferClipboardData(
 
 void WaylandConnection::RequestClipboardData(
     const std::string& mime_type,
-    PlatformClipboard::DataMap* data_map,
-    PlatformClipboard::RequestDataClosure callback) {
+    ClipboardDelegate::DataMap* data_map,
+    ClipboardDelegate::RequestDataClosure callback) {
   read_clipboard_closure_ = std::move(callback);
 
   DCHECK(data_map);
@@ -308,7 +308,7 @@ void WaylandConnection::ResetPointerFlags() {
 }
 
 void WaylandConnection::GetAvailableMimeTypes(
-    PlatformClipboard::GetMimeTypesClosure callback) {
+    ClipboardDelegate::GetMimeTypesClosure callback) {
   std::move(callback).Run(data_device_->GetAvailableMimeTypes());
 }
 

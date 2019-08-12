@@ -23,8 +23,8 @@
 #include "ui/ozone/platform/wayland/wayland_output.h"
 #include "ui/ozone/platform/wayland/wayland_pointer.h"
 #include "ui/ozone/platform/wayland/wayland_touch.h"
+#include "ui/ozone/public/clipboard_delegate.h"
 #include "ui/ozone/public/interfaces/wayland/wayland_connection.mojom.h"
-#include "ui/ozone/public/platform_clipboard.h"
 
 namespace ui {
 
@@ -36,9 +36,8 @@ class WaylandBufferManager;
 class WaylandFdWatcherGlib;
 #endif
 
-// TODO: factor out PlatformClipboard to a separate class.
 class WaylandConnection : public PlatformEventSource,
-                          public PlatformClipboard,
+                          public ClipboardDelegate,
                           public ozone::mojom::WaylandConnection,
                           public base::MessagePumpLibevent::FdWatcher {
  public:
@@ -113,22 +112,22 @@ class WaylandConnection : public PlatformEventSource,
   }
 
   // Clipboard implementation.
-  PlatformClipboard* GetPlatformClipboard();
+  ClipboardDelegate* GetClipboardDelegate();
   void DataSourceCancelled();
   void SetClipboardData(const std::string& contents,
                         const std::string& mime_type);
   void UpdateClipboardSequenceNumber();
 
-  // PlatformClipboard.
+  // ClipboardDelegate.
   void OfferClipboardData(
-      const PlatformClipboard::DataMap& data_map,
-      PlatformClipboard::OfferDataClosure callback) override;
+      const ClipboardDelegate::DataMap& data_map,
+      ClipboardDelegate::OfferDataClosure callback) override;
   void RequestClipboardData(
       const std::string& mime_type,
-      PlatformClipboard::DataMap* data_map,
-      PlatformClipboard::RequestDataClosure callback) override;
+      ClipboardDelegate::DataMap* data_map,
+      ClipboardDelegate::RequestDataClosure callback) override;
   void GetAvailableMimeTypes(
-      PlatformClipboard::GetMimeTypesClosure callback) override;
+      ClipboardDelegate::GetMimeTypesClosure callback) override;
   bool IsSelectionOwner() override;
   void SetSequenceNumberUpdateCb(
       PlatformClipboard::SequenceNumberUpdateCb cb) override;
@@ -245,7 +244,7 @@ class WaylandConnection : public PlatformEventSource,
 
   // Holds a temporary instance of the client's clipboard content
   // so that we can asynchronously write to it.
-  PlatformClipboard::DataMap* data_map_ = nullptr;
+  ClipboardDelegate::DataMap* data_map_ = nullptr;
 
   // Notifies whenever clipboard sequence number is changed. Can be empty if not
   // set.
