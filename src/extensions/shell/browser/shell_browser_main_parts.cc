@@ -150,7 +150,9 @@ void ShellBrowserMainParts::PostMainMessageLoopStart() {
   // app_shell doesn't need GTK, so the fake input method context can work.
   // See crbug.com/381852 and revision fb69f142.
   // TODO(michaelpg): Verify this works for target environments.
-#if !(defined(USE_OZONE) && defined(OZONE_PLATFORM_WAYLAND_EXTERNAL))
+
+  // For Wayland ozone platforms do not use a stub to initialize the input method.
+#if !defined(USE_OZONE)
   ui::InitializeInputMethodForTesting();
 #endif
 

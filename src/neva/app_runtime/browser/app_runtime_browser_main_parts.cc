@@ -84,9 +84,15 @@ void AppRuntimeBrowserMainParts::DisableDevTools() {
 }
 
 int AppRuntimeBrowserMainParts::PreEarlyInitialization() {
-#if defined(USE_OZONE) && defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+#if defined(USE_OZONE)
+#if defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+  // Initialization of input method factory
   views::LinuxUI::SetInstance(BuildWebUI());
 #else
+  // Do nothing. Google ozone Wayland initializes input method itself.
+#endif
+#else
+  // Only for testing. As stub for other platforms.
   ui::InitializeInputMethodForTesting();
 #endif
   return service_manager::RESULT_CODE_NORMAL_EXIT;
