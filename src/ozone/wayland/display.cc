@@ -27,6 +27,7 @@
 #include <xf86drm.h>
 #endif
 #include <string>
+#include <vector>
 
 #include "base/bind.h"
 #include "base/files/file_path.h"
@@ -44,6 +45,9 @@
 #include "ozone/wayland/egl/wayland_pixmap.h"
 #endif
 #include "ozone/wayland/input/cursor.h"
+#include "ozone/wayland/input/keyboard.h"
+#include "ozone/wayland/input/pointer.h"
+#include "ozone/wayland/input/touchscreen.h"
 #if defined(OS_WEBOS)
 #include "ozone/wayland/group/webos_surface_group_compositor.h"
 #include "wayland-text-client-protocol.h"
@@ -58,6 +62,8 @@
 #include "ozone/wayland/seat.h"
 #include "ozone/wayland/shell/shell.h"
 #include "ozone/wayland/window.h"
+#include "ui/events/devices/input_device.h"
+#include "ui/events/devices/touchscreen_device.h"
 #include "ui/gfx/native_pixmap.h"
 #include "ui/ozone/common/egl_util.h"
 #include "ui/ozone/common/gl_ozone_egl.h"
@@ -1055,6 +1061,30 @@ bool WaylandDisplay::OnMessageReceived(const IPC::Message& message) {
 
 IPC::MessageFilter* WaylandDisplay::GetMessageFilter() {
   return NULL;
+}
+
+void WaylandDisplay::KeyboardAdded(int id, const std::string& name) {
+  Dispatch(new WaylandInput_KeyboardAdded(id, name));
+}
+
+void WaylandDisplay::KeyboardRemoved(int id) {
+  Dispatch(new WaylandInput_KeyboardRemoved(id));
+}
+
+void WaylandDisplay::PointerAdded(int id, const std::string& name) {
+  Dispatch(new WaylandInput_PointerAdded(id, name));
+}
+
+void WaylandDisplay::PointerRemoved(int id) {
+  Dispatch(new WaylandInput_PointerRemoved(id));
+}
+
+void WaylandDisplay::TouchscreenAdded(int id, const std::string& name) {
+  Dispatch(new WaylandInput_TouchscreenAdded(id, name));
+}
+
+void WaylandDisplay::TouchscreenRemoved(int id) {
+  Dispatch(new WaylandInput_TouchscreenRemoved(id));
 }
 
 void WaylandDisplay::MotionNotify(float x, float y) {

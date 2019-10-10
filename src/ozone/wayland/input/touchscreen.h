@@ -6,16 +6,17 @@
 #define OZONE_WAYLAND_INPUT_TOUCHSCREEN_H_
 
 #include "ozone/wayland/display.h"
+#include "ozone/wayland/input/hotplug_device.h"
 #include "ui/gfx/geometry/point.h"
 
 namespace ozonewayland {
 
 class WaylandWindow;
 
-class WaylandTouchscreen {
+class WaylandTouchscreen : public HotplugDevice {
  public:
-  WaylandTouchscreen();
-  ~WaylandTouchscreen();
+  WaylandTouchscreen(WaylandDisplay* dispatcher);
+  ~WaylandTouchscreen() override;
 
   void OnSeatCapabilities(wl_seat *seat, uint32_t caps);
 
@@ -53,7 +54,6 @@ class WaylandTouchscreen {
       void *data,
       struct wl_touch *wl_touch);
 
-  WaylandDisplay* dispatcher_;
   gfx::Point pointer_position_;
   struct wl_touch* wl_touch_;
 
