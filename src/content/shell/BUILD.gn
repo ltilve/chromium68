@@ -105,6 +105,7 @@ static_library("content_shell_nontest_lib") {
 
   deps = [
     "//skia",
+    ":content_shell_resources_grit",
   ]
   if (!use_cbe) {
     testonly = true
