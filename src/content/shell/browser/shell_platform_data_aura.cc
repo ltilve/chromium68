@@ -15,6 +15,7 @@
 #include "ui/base/ime/input_method.h"
 #include "ui/base/ime/input_method_delegate.h"
 #include "ui/base/ime/input_method_factory.h"
+#include "ui/views/widget/desktop_aura/desktop_screen.h"
 #include "ui/wm/core/default_activation_client.h"
 
 #if !defined(USE_CBE)
@@ -72,23 +73,7 @@ ShellPlatformDataAura::ShellPlatformDataAura(const gfx::Size& initial_size) {
 
   // Setup global display::Screen singleton.
   if (!display::Screen::GetScreen()) {
-#if defined(USE_OZONE)
-    auto platform_screen = ui::OzonePlatform::GetInstance()->CreateScreen();
-    if (platform_screen)
-      screen_ = std::make_unique<aura::ScreenOzone>(std::move(platform_screen));
-#endif  // defined(USE_OZONE)
-
-    // Use aura::TestScreen for Ozone platforms that don't provide
-    // PlatformScreen.
-    // TODO(https://crbug.com/872339): Implement PlatformScreen for all
-    // platforms and remove this code.
-    if (!screen_) {
-      // Some layout tests expect to be able to resize the window, so the screen
-      // must be larger than the window.
-      screen_.reset(
-          aura::TestScreen::Create(gfx::ScaleToCeiledSize(initial_size, 2.0)));
-    }
-    display::Screen::SetScreenInstance(screen_.get());
+    display::Screen::SetScreenInstance(views::CreateDesktopScreen());
   }
 
   host_.reset(aura::WindowTreeHost::Create(gfx::Rect(initial_size)));
