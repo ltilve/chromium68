@@ -8,9 +8,11 @@ namespace extensions {
 
 DisplayInfoProviderAura::DisplayInfoProviderAura() = default;
 
+#if !defined(USE_CBE)
 // static
 DisplayInfoProvider* DisplayInfoProvider::Create() {
   return new DisplayInfoProviderAura();
 }
+#endif
 
 }  // namespace extensions
