@@ -27,6 +27,14 @@ WaylandInputMethodContextFactory::CreateInputMethodContext(
   return CreateWaylandInputMethodContext(delegate, is_simple);
 }
 
+std::unique_ptr<LinuxInputMethodContext>
+WaylandInputMethodContextFactory::CreateInputMethodContext(
+    LinuxInputMethodContextDelegate* delegate,
+    unsigned /* handle */,
+    bool is_simple) const {
+  return CreateInputMethodContext(delegate, is_simple);
+}
+
 std::unique_ptr<WaylandInputMethodContext>
 WaylandInputMethodContextFactory::CreateWaylandInputMethodContext(
     ui::LinuxInputMethodContextDelegate* delegate,

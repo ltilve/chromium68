@@ -22,6 +22,11 @@ class WaylandInputMethodContextFactory : public LinuxInputMethodContextFactory {
       ui::LinuxInputMethodContextDelegate* delegate,
       bool is_simple) const override;
 
+  std::unique_ptr<LinuxInputMethodContext> CreateInputMethodContext(
+      ui::LinuxInputMethodContextDelegate* delegate,
+      unsigned handle,
+      bool is_simple) const override;
+
   // Exposed for unit tests but also called by CreateInputMethodContext
   std::unique_ptr<WaylandInputMethodContext> CreateWaylandInputMethodContext(
       ui::LinuxInputMethodContextDelegate* delegate,
