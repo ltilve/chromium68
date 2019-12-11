@@ -10,6 +10,7 @@
 #include "ui/base/ui_features.h"
 #include "ui/events/ozone/evdev/event_dispatch_callback.h"
 #include "ui/events/ozone/keyboard/event_auto_repeat_handler.h"
+#include "ui/ozone/platform/wayland/wayland_hotplug_input.h"
 #include "ui/ozone/platform/wayland/wayland_object.h"
 
 namespace ui {
@@ -20,16 +21,13 @@ class XkbKeyboardLayoutEngine;
 #endif
 class WaylandConnection;
 
-class WaylandKeyboard : public EventAutoRepeatHandler::Delegate {
+class WaylandKeyboard : public HotplugInput,
+                        public EventAutoRepeatHandler::Delegate {
  public:
   WaylandKeyboard(wl_keyboard* keyboard,
                   KeyboardLayoutEngine* keyboard_layout_engine,
                   const EventDispatchCallback& callback);
-  virtual ~WaylandKeyboard();
-
-  void set_connection(WaylandConnection* connection) {
-    connection_ = connection;
-  }
+  ~WaylandKeyboard() override;
 
   int modifiers() { return modifiers_; }
 
@@ -79,7 +77,6 @@ class WaylandKeyboard : public EventAutoRepeatHandler::Delegate {
                    base::TimeTicks timestamp,
                    int device_id) override;
 
-  WaylandConnection* connection_ = nullptr;
   wl::Object<wl_keyboard> obj_;
   EventDispatchCallback callback_;
   int modifiers_ = 0;
