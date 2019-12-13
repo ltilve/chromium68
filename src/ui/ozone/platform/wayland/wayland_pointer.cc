@@ -33,7 +33,9 @@ bool HasAnyButtonFlag(int flags) {
 
 WaylandPointer::WaylandPointer(wl_pointer* pointer,
                                const EventDispatchCallback& callback)
-    : obj_(pointer), callback_(callback), weak_ptr_factory_(this) {
+    : WaylandHotplugInput(callback),
+      obj_(pointer),
+      weak_ptr_factory_(this) {
   static const wl_pointer_listener listener = {
       &WaylandPointer::Enter,  &WaylandPointer::Leave, &WaylandPointer::Motion,
       &WaylandPointer::Button, &WaylandPointer::Axis,
@@ -76,7 +78,7 @@ void WaylandPointer::Leave(void* data,
   WaylandPointer* pointer = static_cast<WaylandPointer*>(data);
   MouseEvent event(ET_MOUSE_EXITED, gfx::Point(), gfx::Point(),
                    EventTimeForNow(), pointer->flags_, 0);
-  pointer->callback_.Run(&event);
+  pointer->get_callback().Run(&event);
   if (surface) {
     WaylandWindow* window = WaylandWindow::FromSurface(surface);
     window->set_pointer_focus(false);
@@ -98,7 +100,7 @@ void WaylandPointer::Motion(void* data,
                    0);
   event.set_location_f(pointer->location_);
   event.set_root_location_f(pointer->location_);
-  pointer->callback_.Run(&event);
+  pointer->get_callback().Run(&event);
 }
 
 // static
@@ -134,7 +136,7 @@ void WaylandPointer::Button(void* data,
   if (state == WL_POINTER_BUTTON_STATE_PRESSED) {
     type = ET_MOUSE_PRESSED;
     pointer->flags_ |= changed_button;
-    pointer->connection_->set_serial(serial);
+    pointer->get_connection()->set_serial(serial);
   } else {
     type = ET_MOUSE_RELEASED;
     pointer->flags_ &= ~changed_button;
@@ -152,7 +154,7 @@ void WaylandPointer::Button(void* data,
   event.set_root_location_f(pointer->location_);
 
   auto weak_ptr = pointer->weak_ptr_factory_.GetWeakPtr();
-  pointer->callback_.Run(&event);
+  pointer->get_callback().Run(&event);
 
   // Reset implicit grab only after the event has been sent. Otherwise,
   // we may end up in a situation, when a target checks for a pointer grab on
@@ -189,7 +191,7 @@ void WaylandPointer::Axis(void* data,
                         pointer->GetFlagsWithKeyboardModifiers(), 0);
   event.set_location_f(pointer->location_);
   event.set_root_location_f(pointer->location_);
-  pointer->callback_.Run(&event);
+  pointer->get_callback().Run(&event);
 }
 
 void WaylandPointer::MaybeSetOrResetImplicitGrab() {
@@ -204,7 +206,7 @@ int WaylandPointer::GetFlagsWithKeyboardModifiers() {
 
   // Remove old modifiers from flags and then update them with new modifiers.
   flags_ &= ~keyboard_modifiers_;
-  keyboard_modifiers_ = connection_->GetKeyboardModifiers();
+  keyboard_modifiers_ = get_connection()->GetKeyboardModifiers();
 
   int old_flags = flags_;
   flags_ |= keyboard_modifiers_;

@@ -8,12 +8,17 @@
 #include <xdg-shell-unstable-v6-client-protocol.h>
 
 #include "base/bind.h"
+#include "base/command_line.h"
 #include "base/logging.h"
 #include "base/memory/ptr_util.h"
 #include "base/message_loop/message_loop.h"
 #include "base/message_loop/message_loop_current.h"
+#include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "base/threading/thread_task_runner_handle.h"
+#include "ui/events/devices/device_data_manager.h"
+#include "ui/events/devices/device_hotplug_event_observer.h"
+#include "ui/events/event_switches.h"
 #include "ui/events/ozone/layout/keyboard_layout_engine_manager.h"
 #include "ui/gfx/swap_result.h"
 #include "ui/ozone/platform/wayland/wayland_buffer_manager.h"
@@ -27,6 +32,12 @@
 #endif
 
 static_assert(XDG_SHELL_VERSION_CURRENT == 5, "Unsupported xdg-shell version");
+
+namespace {
+const char kKeyboardSuffix[] = "_keyboard";
+const char kPointerSuffix[] = "_pointer";
+const char kTouchscreenSuffix[] = "_touch";
+}  // namespace
 
 namespace ui {
 
@@ -516,9 +527,13 @@ void WaylandConnection::Capabilities(void* data,
       connection->pointer_ = std::make_unique<WaylandPointer>(
           pointer, base::BindRepeating(&WaylandConnection::DispatchUiEvent,
                                        base::Unretained(connection)));
+      connection->pointer_->SetName(connection->seat_name_ + kPointerSuffix);
+      connection->PointerAdded(connection->pointer_->GetId(),
+			       connection->pointer_->GetName());
       connection->pointer_->set_connection(connection);
     }
   } else if (connection->pointer_) {
+    connection->PointerRemoved(connection->pointer_->GetId());
     connection->pointer_.reset();
   }
   if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD) {
@@ -532,9 +547,13 @@ void WaylandConnection::Capabilities(void* data,
           keyboard, KeyboardLayoutEngineManager::GetKeyboardLayoutEngine(),
           base::BindRepeating(&WaylandConnection::DispatchUiEvent,
                               base::Unretained(connection)));
+      connection->keyboard_->SetName(connection->seat_name_ + kKeyboardSuffix);
+      connection->KeyboardAdded(connection->keyboard_->GetId(),
+				connection->keyboard_->GetName());
       connection->keyboard_->set_connection(connection);
     }
   } else if (connection->keyboard_) {
+    connection->KeyboardRemoved(connection->keyboard_->GetId());
     connection->keyboard_.reset();
   }
   if (capabilities & WL_SEAT_CAPABILITY_TOUCH) {
@@ -547,16 +566,99 @@ void WaylandConnection::Capabilities(void* data,
       connection->touch_ = std::make_unique<WaylandTouch>(
           touch, base::BindRepeating(&WaylandConnection::DispatchUiEvent,
                                      base::Unretained(connection)));
+      connection->touch_->SetName(connection->seat_name_ + kTouchscreenSuffix);
+      connection->TouchscreenAdded(connection->touch_->GetId(),
+				   connection->touch_->GetName());
       connection->touch_->set_connection(connection);
     }
   } else if (connection->touch_) {
+    connection->TouchscreenRemoved(connection->touch_->GetId());
     connection->touch_.reset();
   }
   connection->ScheduleFlush();
 }
 
 // static
-void WaylandConnection::Name(void* data, wl_seat* seat, const char* name) {}
+void WaylandConnection::Name(void* data, wl_seat* seat, const char* name) {
+  WaylandConnection* connection = static_cast<WaylandConnection*>(data);
+
+  connection->seat_name_ = name;
+
+  if (connection->pointer_) {
+    connection->pointer_->SetName(connection->seat_name_ + kPointerSuffix);
+    connection->PointerRemoved(connection->pointer_->GetId());
+    connection->PointerAdded(connection->pointer_->GetId(),
+			     connection->pointer_->GetName());
+  }
+  if (connection->keyboard_) {
+    connection->keyboard_->SetName(connection->seat_name_ + kKeyboardSuffix);
+    connection->KeyboardRemoved(connection->keyboard_->GetId());
+    connection->KeyboardAdded(connection->keyboard_->GetId(),
+			      connection->keyboard_->GetName());
+  }
+  if (connection->touch_) {
+    connection->touch_->SetName(connection->seat_name_ + kTouchscreenSuffix);
+    connection->TouchscreenRemoved(connection->touch_->GetId());
+    connection->TouchscreenAdded(connection->touch_->GetId(),
+				 connection->touch_->GetName());
+  }
+}
+
+ui::DeviceHotplugEventObserver*
+WaylandConnection::GetHotplugEventObserver() {
+  return ui::DeviceDataManager::GetInstance();
+}
+
+void WaylandConnection::KeyboardAdded(int id, const std::string& name) {
+  keyboard_devices_.push_back(
+      ui::InputDevice(id, ui::INPUT_DEVICE_UNKNOWN, name));
+  GetHotplugEventObserver()->OnKeyboardDevicesUpdated(keyboard_devices_);
+}
+
+void WaylandConnection::KeyboardRemoved(int id) {
+  base::EraseIf(keyboard_devices_,
+                [id](const auto& device) { return device.id == id; });
+  GetHotplugEventObserver()->OnKeyboardDevicesUpdated(keyboard_devices_);
+}
+
+void WaylandConnection::PointerAdded(int id, const std::string& name) {
+  pointer_devices_.push_back(
+      ui::InputDevice(id, ui::INPUT_DEVICE_UNKNOWN, name));
+  GetHotplugEventObserver()->OnMouseDevicesUpdated(pointer_devices_);
+}
+
+void WaylandConnection::PointerRemoved(int id) {
+  base::EraseIf(pointer_devices_,
+                [id](const auto& device) { return device.id == id; });
+  GetHotplugEventObserver()->OnMouseDevicesUpdated(pointer_devices_);
+}
+
+void WaylandConnection::TouchscreenAdded(int id, const std::string& name) {
+  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
+  if (command_line->HasSwitch(switches::kIgnoreTouchDevices))
+    return;
+  int max_touch_points = 1;
+  std::string override_max_touch_points =
+      command_line->GetSwitchValueASCII(switches::kForceMaxTouchPoints);
+  if (!override_max_touch_points.empty()) {
+    int temp;
+    if (base::StringToInt(override_max_touch_points, &temp))
+      max_touch_points = temp;
+  }
+  touchscreen_devices_.push_back(ui::TouchscreenDevice(
+      id, ui::INPUT_DEVICE_UNKNOWN, name, gfx::Size(), max_touch_points));
+  GetHotplugEventObserver()->OnTouchscreenDevicesUpdated(touchscreen_devices_);
+}
+
+void WaylandConnection::TouchscreenRemoved(int id) {
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kIgnoreTouchDevices)) {
+    return;
+  }
+  base::EraseIf(touchscreen_devices_,
+                [id](const auto& device) { return device.id == id; });
+  GetHotplugEventObserver()->OnTouchscreenDevicesUpdated(touchscreen_devices_);
+}
 
 // static
 void WaylandConnection::PingV6(void* data,

@@ -19,9 +19,8 @@ class KeyboardLayoutEngine;
 #if BUILDFLAG(USE_XKBCOMMON)
 class XkbKeyboardLayoutEngine;
 #endif
-class WaylandConnection;
 
-class WaylandKeyboard : public HotplugInput,
+class WaylandKeyboard : public WaylandHotplugInput,
                         public EventAutoRepeatHandler::Delegate {
  public:
   WaylandKeyboard(wl_keyboard* keyboard,
@@ -78,7 +77,6 @@ class WaylandKeyboard : public HotplugInput,
                    int device_id) override;
 
   wl::Object<wl_keyboard> obj_;
-  EventDispatchCallback callback_;
   int modifiers_ = 0;
 
   // Key repeat handler.

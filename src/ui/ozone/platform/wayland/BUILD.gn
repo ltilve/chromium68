@@ -37,6 +37,8 @@ source_set("wayland") {
     "wayland_data_offer.h",
     "wayland_data_source.cc",
     "wayland_data_source.h",
+    "wayland_hotplug_input.cc",
+    "wayland_hotplug_input.h",
     "wayland_input_method_context.cc",
     "wayland_input_method_context.h",
     "wayland_input_method_context_factory.cc",

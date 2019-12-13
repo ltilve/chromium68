@@ -27,7 +27,7 @@ WaylandTouch::TouchPoint::~TouchPoint() = default;
 
 WaylandTouch::WaylandTouch(wl_touch* touch,
                            const EventDispatchCallback& callback)
-    : obj_(touch), callback_(callback) {
+  : WaylandHotplugInput(callback), obj_(touch) {
   static const wl_touch_listener listener = {
       &WaylandTouch::Down,  &WaylandTouch::Up,     &WaylandTouch::Motion,
       &WaylandTouch::Frame, &WaylandTouch::Cancel,
@@ -71,7 +71,7 @@ void WaylandTouch::Down(void* data,
     return;
   WaylandTouch* touch = static_cast<WaylandTouch*>(data);
   DCHECK(touch);
-  touch->connection_->set_serial(serial);
+  touch->get_connection()->set_serial(serial);
   WaylandWindow::FromSurface(surface)->set_touch_focus(true);
 
   // Make sure this touch point wasn't present before.
@@ -86,7 +86,7 @@ void WaylandTouch::Down(void* data,
       base::TimeTicks() + base::TimeDelta::FromMilliseconds(time);
   PointerDetails pointer_details(EventPointerType::POINTER_TYPE_TOUCH, id);
   TouchEvent event(type, location, time_stamp, pointer_details);
-  touch->callback_.Run(&event);
+  touch->get_callback().Run(&event);
 
   touch->current_points_[id] = TouchPoint(location, surface);
 }
@@ -112,7 +112,7 @@ void WaylandTouch::Up(void* data,
   PointerDetails pointer_details(EventPointerType::POINTER_TYPE_TOUCH, id);
   TouchEvent event(type, touch->current_points_[id].last_known_location,
                    time_stamp, pointer_details);
-  touch->callback_.Run(&event);
+  touch->get_callback().Run(&event);
 
   touch->MaybeUnsetFocus(touch->current_points_, id,
                          touch->current_points_[id].surface);
@@ -140,7 +140,7 @@ void WaylandTouch::Motion(void* data,
       base::TimeTicks() + base::TimeDelta::FromMilliseconds(time);
   PointerDetails pointer_details(EventPointerType::POINTER_TYPE_TOUCH, id);
   TouchEvent event(type, location, time_stamp, pointer_details);
-  touch->callback_.Run(&event);
+  touch->get_callback().Run(&event);
   touch->current_points_[id].last_known_location = location;
 }
 
@@ -156,7 +156,7 @@ void WaylandTouch::Cancel(void* data, wl_touch* obj) {
     base::TimeTicks time_stamp = base::TimeTicks::Now();
     PointerDetails pointer_details(EventPointerType::POINTER_TYPE_TOUCH, id);
     TouchEvent event(type, gfx::Point(), time_stamp, pointer_details);
-    touch->callback_.Run(&event);
+    touch->get_callback().Run(&event);
 
     WaylandWindow::FromSurface(point.second.surface)->set_touch_focus(false);
   }

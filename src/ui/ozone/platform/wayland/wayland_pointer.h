@@ -10,20 +10,21 @@
 #include "ui/events/ozone/evdev/event_dispatch_callback.h"
 #include "ui/gfx/geometry/point_f.h"
 #include "ui/ozone/platform/wayland/wayland_cursor.h"
+#include "ui/ozone/platform/wayland/wayland_hotplug_input.h"
 #include "ui/ozone/platform/wayland/wayland_object.h"
 
 namespace ui {
 
 class WaylandWindow;
 
-class WaylandPointer {
+class WaylandPointer : public WaylandHotplugInput {
  public:
   WaylandPointer(wl_pointer* pointer, const EventDispatchCallback& callback);
-  virtual ~WaylandPointer();
+  ~WaylandPointer() override;
 
-  void set_connection(WaylandConnection* connection) {
-    connection_ = connection;
-    cursor_->Init(obj_.get(), connection_);
+  void set_connection(WaylandConnection* connection) override {
+    WaylandHotplugInput::set_connection(connection);
+    cursor_->Init(obj_.get(), get_connection());
   }
 
   int GetFlagsWithKeyboardModifiers();
@@ -66,10 +67,8 @@ class WaylandPointer {
 
   void MaybeSetOrResetImplicitGrab();
 
-  WaylandConnection* connection_ = nullptr;
   std::unique_ptr<WaylandCursor> cursor_;
   wl::Object<wl_pointer> obj_;
-  EventDispatchCallback callback_;
   gfx::PointF location_;
   // Flags is a bitmask of EventFlags corresponding to the pointer/keyboard
   // state.

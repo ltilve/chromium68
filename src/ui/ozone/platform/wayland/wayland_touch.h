@@ -10,21 +10,17 @@
 #include "base/containers/flat_map.h"
 #include "ui/events/ozone/evdev/event_dispatch_callback.h"
 #include "ui/gfx/geometry/rect.h"
+#include "ui/ozone/platform/wayland/wayland_hotplug_input.h"
 #include "ui/ozone/platform/wayland/wayland_object.h"
 
 namespace ui {
 
-class WaylandConnection;
 class WaylandWindow;
 
-class WaylandTouch {
+class WaylandTouch : public WaylandHotplugInput {
  public:
   WaylandTouch(wl_touch* touch, const EventDispatchCallback& callback);
-  virtual ~WaylandTouch();
-
-  void set_connection(WaylandConnection* connection) {
-    connection_ = connection;
-  }
+  ~WaylandTouch() override;
 
   void RemoveTouchPoints(const WaylandWindow* window);
 
@@ -67,9 +63,7 @@ class WaylandTouch {
   static void Frame(void* data, wl_touch* obj);
   static void Cancel(void* data, wl_touch* obj);
 
-  WaylandConnection* connection_ = nullptr;
   wl::Object<wl_touch> obj_;
-  EventDispatchCallback callback_;
   TouchPoints current_points_;
 
   DISALLOW_COPY_AND_ASSIGN(WaylandTouch);

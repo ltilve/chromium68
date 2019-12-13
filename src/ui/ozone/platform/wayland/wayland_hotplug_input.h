@@ -10,6 +10,8 @@
 
 namespace ui {
 
+class WaylandConnection;
+
 class WaylandHotplugInput {
  public:
   WaylandHotplugInput(const EventDispatchCallback& callback);
@@ -23,8 +25,12 @@ class WaylandHotplugInput {
   std::string GetName() const { return name_; }
 
  protected:
-  WaylandConnection* connection() const {
+  WaylandConnection* get_connection() const {
     return connection_;
+  }
+
+  EventDispatchCallback& get_callback() {
+    return callback_;
   }
 
  private:

@@ -34,8 +34,8 @@ const wl_callback_listener WaylandKeyboard::callback_listener_ = {
 WaylandKeyboard::WaylandKeyboard(wl_keyboard* keyboard,
                                  KeyboardLayoutEngine* layout_engine,
                                  const EventDispatchCallback& callback)
-    : obj_(keyboard),
-      callback_(callback),
+    : WaylandHotplugInput(callback),
+      obj_(keyboard),
       auto_repeat_handler_(this),
 #if BUILDFLAG(USE_XKBCOMMON)
       layout_engine_(static_cast<XkbKeyboardLayoutEngine*>(layout_engine)) {
@@ -113,7 +113,7 @@ void WaylandKeyboard::Key(void* data,
   WaylandKeyboard* keyboard = static_cast<WaylandKeyboard*>(data);
   DCHECK(keyboard);
 
-  keyboard->connection_->set_serial(serial);
+  keyboard->get_connection()->set_serial(serial);
 
   bool down = state == WL_KEYBOARD_KEY_STATE_PRESSED;
   int device_id = keyboard->obj_.id();
@@ -163,9 +163,9 @@ void WaylandKeyboard::FlushInput(base::OnceClosure closure) {
   // wl_display_sync gives a chance for any key "up" events to arrive.
   // With a well behaved wayland compositor this should ensure we never
   // get spurious repeats.
-  sync_callback_.reset(wl_display_sync(connection_->display()));
+  sync_callback_.reset(wl_display_sync(get_connection()->display()));
   wl_callback_add_listener(sync_callback_.get(), &callback_listener_, this);
-  wl_display_flush(connection_->display());
+  wl_display_flush(get_connection()->display());
 }
 
 void WaylandKeyboard::DispatchKey(uint32_t key,
@@ -191,7 +191,7 @@ void WaylandKeyboard::DispatchKey(uint32_t key,
   ui::KeyEvent event(down ? ET_KEY_PRESSED : ET_KEY_RELEASED, key_code,
                      dom_code, modifiers_, dom_key, timestamp);
   event.set_source_device_id(device_id);
-  callback_.Run(&event);
+  get_callback().Run(&event);
 }
 
 void WaylandKeyboard::SyncCallback(void* data,

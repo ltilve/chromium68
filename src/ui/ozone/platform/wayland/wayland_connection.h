@@ -12,6 +12,8 @@
 #include "base/files/file.h"
 #include "base/message_loop/message_pump_libevent.h"
 #include "mojo/public/cpp/bindings/binding.h"
+#include "ui/events/devices/input_device.h"
+#include "ui/events/devices/touchscreen_device.h"
 #include "ui/events/platform/platform_event_source.h"
 #include "ui/gfx/buffer_types.h"
 #include "ui/gfx/native_widget_types.h"
@@ -28,6 +30,7 @@
 
 namespace ui {
 
+class DeviceHotplugEventObserver;
 class WaylandOutputManager;
 class WaylandWindow;
 class WaylandBufferManager;
@@ -169,6 +172,14 @@ class WaylandConnection : public PlatformEventSource,
   // make something better here.
   void OnFileCanReadWithoutBlocking(int fd) override;
 
+  void KeyboardAdded(int id, const std::string& name);
+  void KeyboardRemoved(int id);
+  void PointerAdded(int id, const std::string& name);
+  void PointerRemoved(int id);
+  void TouchscreenAdded(int id, const std::string& name);
+  void TouchscreenRemoved(int id);
+  ui::DeviceHotplugEventObserver* GetHotplugEventObserver();
+
  private:
   // WaylandInputMethodContextFactory needs access to DispatchUiEvent
   friend class WaylandInputMethodContextFactory;
@@ -212,6 +223,7 @@ class WaylandConnection : public PlatformEventSource,
   wl::Object<wl_compositor> compositor_;
   wl::Object<wl_subcompositor> subcompositor_;
   wl::Object<wl_seat> seat_;
+  std::string seat_name_;
   wl::Object<wl_shm> shm_;
   wl::Object<xdg_shell> shell_;
   wl::Object<zxdg_shell_v6> shell_v6_;
@@ -228,6 +240,9 @@ class WaylandConnection : public PlatformEventSource,
   std::unique_ptr<WaylandOutputManager> wayland_output_manager_;
   std::unique_ptr<WaylandPointer> pointer_;
   std::unique_ptr<WaylandTouch> touch_;
+  std::vector<ui::InputDevice> keyboard_devices_;
+  std::vector<ui::InputDevice> pointer_devices_;
+  std::vector<ui::TouchscreenDevice> touchscreen_devices_;
 
   // Objects that are using when GPU runs in own process.
   std::unique_ptr<WaylandBufferManager> buffer_manager_;
