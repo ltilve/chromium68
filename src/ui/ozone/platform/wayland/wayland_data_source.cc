@@ -39,7 +39,7 @@ void WaylandDataSource::WriteToClipboard(
   wl_display_flush(connection_->display());
 }
 
-void WaylandDataSource::UpdataDataMap(
+void WaylandDataSource::UpdateDataMap(
     const ClipboardDelegate::DataMap& data_map) {
   data_map_ = data_map;
 }

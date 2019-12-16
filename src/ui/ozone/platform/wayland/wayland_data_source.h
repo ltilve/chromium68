@@ -43,7 +43,7 @@ class WaylandDataSource {
   }
 
   void WriteToClipboard(const ClipboardDelegate::DataMap& data_map);
-  void UpdataDataMap(const ClipboardDelegate::DataMap& data_map);
+  void UpdateDataMap(const ClipboardDelegate::DataMap& data_map);
   void Offer(const ui::OSExchangeData& data);
   void SetAction(int operation);
   void SetDragData(const DragDataMap& data_map);
