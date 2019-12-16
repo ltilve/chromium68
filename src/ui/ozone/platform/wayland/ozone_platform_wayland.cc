@@ -13,6 +13,7 @@
 #include "ui/base/cursor/ozone/bitmap_cursor_factory_ozone.h"
 #include "ui/base/ui_features.h"
 #include "ui/display/manager/fake_display_delegate.h"
+#include "ui/events/devices/device_data_manager.h"
 #include "ui/events/ozone/layout/keyboard_layout_engine_manager.h"
 #include "ui/events/system_input_injector.h"
 #include "ui/gfx/linux/client_native_pixmap_dmabuf.h"
@@ -152,6 +153,10 @@ class OzonePlatformWayland : public OzonePlatform {
     KeyboardLayoutEngineManager::SetKeyboardLayoutEngine(
         std::make_unique<StubKeyboardLayoutEngine>());
 #endif
+    // Ensure device data manager is created as it can be called on Wayland
+    // connection initialization
+    DeviceDataManager::CreateInstance();
+
     connection_.reset(new WaylandConnection);
     if (!connection_->Initialize())
       LOG(FATAL) << "Failed to initialize Wayland platform";
