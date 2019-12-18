@@ -163,8 +163,10 @@ void WaylandDataDevice::StartDrag(wl_data_source* data_source,
   // When touch DnD starts, we get touch down, but not a touch up. So we need
   // to forget the current points for the window. Otherwise, next touch down
   // after DnD will do nothing.
-  if (connection_->touch())
+  if (connection_->touch()) {
+    window->set_touch_focus(false);
     connection_->touch()->RemoveTouchPoints(window);
+  }
 
   const SkBitmap* icon = PrepareDragIcon(data);
   source_data_ = std::make_unique<ui::OSExchangeData>(data.provider().Clone());
