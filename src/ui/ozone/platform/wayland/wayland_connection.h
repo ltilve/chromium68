@@ -112,6 +112,9 @@ class WaylandConnection : public PlatformEventSource,
   // Returns the current pointer, which may be null.
   WaylandPointer* pointer() { return pointer_.get(); }
 
+  // Returns the current touch, which may be null.
+  WaylandTouch* touch() const { return touch_.get(); }
+
   WaylandDataSource* drag_data_source() {
     return dragdrop_data_source_.get();
   }

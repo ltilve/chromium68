@@ -16,6 +16,7 @@
 #include "ui/base/dragdrop/os_exchange_data.h"
 #include "ui/base/dragdrop/os_exchange_data_provider_aura.h"
 #include "ui/ozone/platform/wayland/wayland_connection.h"
+#include "ui/ozone/platform/wayland/wayland_touch.h"
 #include "ui/ozone/platform/wayland/wayland_util.h"
 #include "ui/ozone/platform/wayland/wayland_window.h"
 
@@ -158,6 +159,13 @@ void WaylandDataDevice::StartDrag(wl_data_source* data_source,
     LOG(ERROR) << "Failed to get focused window.";
     return;
   }
+
+  // When touch DnD starts, we get touch down, but not a touch up. So we need
+  // to forget the current points for the window. Otherwise, next touch down
+  // after DnD will do nothing.
+  if (connection_->touch())
+    connection_->touch()->RemoveTouchPoints(window);
+
   const SkBitmap* icon = PrepareDragIcon(data);
   source_data_ = std::make_unique<ui::OSExchangeData>(data.provider().Clone());
   wl_data_device_start_drag(data_device_.get(), data_source, window->surface(),
