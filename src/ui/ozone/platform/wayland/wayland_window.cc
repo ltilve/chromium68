@@ -255,7 +255,7 @@ void WaylandWindow::StartDrag(const ui::OSExchangeData& data,
                               base::OnceCallback<void(int)> callback) {
   DCHECK(!drag_closed_callback_);
   drag_closed_callback_ = std::move(callback);
-  connection_->StartDrag(data, operation);
+  connection_->StartDrag(data, operation, this);
 }
 
 void WaylandWindow::Show() {

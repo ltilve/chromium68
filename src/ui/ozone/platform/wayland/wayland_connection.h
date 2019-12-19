@@ -151,7 +151,8 @@ class WaylandConnection : public PlatformEventSource,
 
   // Starts drag with |data| to be delivered, |operation| supported by the
   // source side initiated the dragging.
-  void StartDrag(const ui::OSExchangeData& data, int operation);
+  void StartDrag(const ui::OSExchangeData& data, int operation,
+                 WaylandWindow* source_window);
   // Finishes drag and drop session. It happens when WaylandDataSource gets
   // 'OnDnDFinished' or 'OnCancel', which means the drop is performed or
   // canceled on others.

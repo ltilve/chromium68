@@ -52,7 +52,8 @@ class WaylandDataDevice {
   void DeliverDragData(const std::string& mime_type, std::string* buffer);
   // Starts drag with |data| to be delivered, |operation| supported by the
   // source side initiated the dragging.
-  void StartDrag(wl_data_source* data_source, const ui::OSExchangeData& data);
+  void StartDrag(wl_data_source* data_source, wl_surface* surface,
+                 const ui::OSExchangeData& data);
   // Resets |source_data_| when the dragging is finished.
   void ResetSourceData();
 

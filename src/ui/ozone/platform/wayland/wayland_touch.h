@@ -22,6 +22,7 @@ class WaylandTouch : public WaylandHotplugInput {
   WaylandTouch(wl_touch* touch, const EventDispatchCallback& callback);
   ~WaylandTouch() override;
 
+  void CancelAll();
   void RemoveTouchPoints(const WaylandWindow* window);
 
  private:

@@ -152,25 +152,12 @@ void WaylandDataDevice::DeliverDragData(const std::string& mime_type,
 }
 
 void WaylandDataDevice::StartDrag(wl_data_source* data_source,
+                                  wl_surface* surface,
                                   const ui::OSExchangeData& data) {
   DCHECK(data_source);
-  WaylandWindow* window = connection_->GetCurrentFocusedWindow();
-  if (!window) {
-    LOG(ERROR) << "Failed to get focused window.";
-    return;
-  }
-
-  // When touch DnD starts, we get touch down, but not a touch up. So we need
-  // to forget the current points for the window. Otherwise, next touch down
-  // after DnD will do nothing.
-  if (connection_->touch()) {
-    window->set_touch_focus(false);
-    connection_->touch()->RemoveTouchPoints(window);
-  }
-
   const SkBitmap* icon = PrepareDragIcon(data);
   source_data_ = std::make_unique<ui::OSExchangeData>(data.provider().Clone());
-  wl_data_device_start_drag(data_device_.get(), data_source, window->surface(),
+  wl_data_device_start_drag(data_device_.get(), data_source, surface,
                             icon_surface_.get(), connection_->serial());
   if (icon)
     DrawDragIcon(icon);

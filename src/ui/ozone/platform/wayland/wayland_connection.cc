@@ -274,19 +274,26 @@ void WaylandConnection::SetTerminateGpuCallback(
   terminate_gpu_cb_ = std::move(terminate_callback);
 }
 
-void WaylandConnection::StartDrag(const ui::OSExchangeData& data,
-                                  int operation) {
+void WaylandConnection::StartDrag(
+    const ui::OSExchangeData& data,
+    int operation,
+    WaylandWindow* source_window) {
   if (!dragdrop_data_source_)
     dragdrop_data_source_ = data_device_manager_->CreateSource();
+  dragdrop_data_source_->set_source_window(source_window);
   dragdrop_data_source_->Offer(data);
   dragdrop_data_source_->SetAction(operation);
-  data_device_->StartDrag(dragdrop_data_source_->data_source(), data);
+  data_device_->StartDrag(dragdrop_data_source_->data_source(),
+                          source_window->surface(), data);
 }
 
 void WaylandConnection::FinishDragSession(uint32_t dnd_action,
                                           WaylandWindow* source_window) {
-  if (source_window)
+  if (source_window) {
     source_window->OnDragSessionClose(dnd_action);
+    touch()->CancelAll();
+    source_window->set_touch_focus(false);
+  }
   data_device_->ResetSourceData();
   dragdrop_data_source_.reset();
 }

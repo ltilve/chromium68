@@ -47,6 +47,21 @@ void WaylandTouch::RemoveTouchPoints(const WaylandWindow* window) {
                 });
 }
 
+void WaylandTouch::CancelAll() {
+  for (auto& point : current_points_) {
+    int32_t id = point.first;
+
+    EventType type = ET_TOUCH_CANCELLED;
+    base::TimeTicks time_stamp = base::TimeTicks::Now();
+    PointerDetails pointer_details(EventPointerType::POINTER_TYPE_TOUCH, id);
+    TouchEvent event(type, gfx::Point(), time_stamp, pointer_details);
+    get_callback().Run(&event);
+
+    WaylandWindow::FromSurface(point.second.surface)->set_touch_focus(false);
+  }
+  current_points_.clear();
+}
+
 void WaylandTouch::MaybeUnsetFocus(const WaylandTouch::TouchPoints& points,
                                    int32_t id,
                                    wl_surface* surface) {
@@ -149,18 +164,7 @@ void WaylandTouch::Frame(void* data, wl_touch* obj) {}
 void WaylandTouch::Cancel(void* data, wl_touch* obj) {
   WaylandTouch* touch = static_cast<WaylandTouch*>(data);
   DCHECK(touch);
-  for (auto& point : touch->current_points_) {
-    int32_t id = point.first;
-
-    EventType type = ET_TOUCH_CANCELLED;
-    base::TimeTicks time_stamp = base::TimeTicks::Now();
-    PointerDetails pointer_details(EventPointerType::POINTER_TYPE_TOUCH, id);
-    TouchEvent event(type, gfx::Point(), time_stamp, pointer_details);
-    touch->get_callback().Run(&event);
-
-    WaylandWindow::FromSurface(point.second.surface)->set_touch_focus(false);
-  }
-  touch->current_points_.clear();
+  touch->CancelAll();
 }
 
 }  // namespace ui
