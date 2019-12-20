@@ -590,6 +590,9 @@ void WebView::UpdatePreferencesAttributeForPrefs(
     case Attribute::NotifyFMPDirectly:
       preferences->notify_fmp_directly = enable;
       break;
+    case Attribute::NavigateOnDragDrop:
+      preferences->navigate_on_drag_drop = enable;
+      break;
     default:
       return;
   }

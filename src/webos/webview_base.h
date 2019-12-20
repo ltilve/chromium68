@@ -201,6 +201,7 @@ class WEBOS_EXPORT WebViewBase
   void SetForceVideoTexture(bool enable);
   void SetNotifyFMPDirectly(bool enable);
   void SetNetworkStableTimeout(double timeout);
+  void SetNavigateOnDragDrop(bool enable);
 
   // FontFamily
   void SetStandardFontFamily(const std::string& font);
