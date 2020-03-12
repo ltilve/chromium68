@@ -489,6 +489,7 @@ void WaylandConnection::Global(void* data,
 		LOG(ERROR) << "Failed to bind to agl_shell global";
 		return;
 	}
+	connection->agl_shell_manager = new AglShell(connection);
   }
 
   connection->ScheduleFlush();

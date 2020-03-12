@@ -26,6 +26,7 @@
 #include "ui/ozone/platform/wayland/wayland_touch.h"
 #include "ui/ozone/public/clipboard_delegate.h"
 #include "ui/ozone/public/interfaces/wayland/wayland_connection.mojom.h"
+#include "ui/ozone/platform/wayland/agl_shell_wrapper.h"
 
 namespace ui {
 
@@ -82,6 +83,7 @@ class WaylandConnection : public PlatformEventSource,
   xdg_shell* shell() const { return shell_.get(); }
   zxdg_shell_v6* shell_v6() const { return shell_v6_.get(); }
   ivi_application* ivi_shell() const { return ivi_application_; }
+  agl_shell *ashell() const { return agl_shell_.get(); }
   wl_seat* seat() { return seat_.get(); }
   wl_data_device* data_device() { return data_device_->data_device(); }
   zwp_text_input_manager_v1* text_input_manager_v1() {
@@ -105,6 +107,7 @@ class WaylandConnection : public PlatformEventSource,
 
   // Returns the current pointer, which may be null.
   WaylandPointer* pointer() { return pointer_.get(); }
+  ui::AglShell *agl_shell_manager;
 
   WaylandDataSource* drag_data_source() { return drag_data_source_.get(); }
 
