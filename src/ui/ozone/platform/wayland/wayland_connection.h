@@ -8,6 +8,7 @@
 #include <map>
 
 #include <ivi-application-client-protocol.h>
+#include <agl-shell-client-protocol.h>
 
 #include "base/files/file.h"
 #include "base/message_loop/message_pump_libevent.h"
@@ -212,6 +213,7 @@ class WaylandConnection : public PlatformEventSource,
   wl::Object<wl_shm> shm_;
   wl::Object<xdg_shell> shell_;
   wl::Object<zxdg_shell_v6> shell_v6_;
+  wl::Object<agl_shell> agl_shell_;
   // TODO(msisov): use wl::Object.
   ivi_application* ivi_application_ = nullptr;
   wl::Object<zwp_text_input_manager_v1> text_input_manager_v1_;

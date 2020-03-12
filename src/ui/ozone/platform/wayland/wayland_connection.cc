@@ -7,6 +7,8 @@
 #include <xdg-shell-unstable-v5-client-protocol.h>
 #include <xdg-shell-unstable-v6-client-protocol.h>
 
+#include <agl-shell-client-protocol.h>
+
 #include "base/bind.h"
 #include "base/logging.h"
 #include "base/memory/ptr_util.h"
@@ -63,6 +65,8 @@ bool WaylandConnection::Initialize() {
     LOG(ERROR) << "Failed to connect to Wayland display";
     return false;
   }
+
+  LOG(INFO) << "Got the wayland display";
 
   registry_.reset(wl_display_get_registry(display_.get()));
   if (!registry_) {
@@ -477,6 +481,14 @@ void WaylandConnection::Global(void* data,
              (strcmp(interface, "wp_presentation") == 0)) {
     connection->presentation_ =
         wl::Bind<wp_presentation>(registry, name, kMaxWpPresentationVersion);
+  } else if (!connection->agl_shell_ && (strcmp(interface, "agl_shell") == 0)) {
+	LOG(INFO) << "Found agl_shell extension";
+	connection->agl_shell_ = wl::Bind<agl_shell>(registry, name, 1);
+
+	if (!connection->agl_shell_) {
+		LOG(ERROR) << "Failed to bind to agl_shell global";
+		return;
+	}
   }
 
   connection->ScheduleFlush();

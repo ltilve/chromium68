@@ -10,6 +10,7 @@
 #include <wayland-client.h>
 #include <xdg-shell-unstable-v5-client-protocol.h>
 #include <xdg-shell-unstable-v6-client-protocol.h>
+#include <agl-shell-client-protocol.h>
 
 namespace wl {
 namespace {
@@ -143,6 +144,9 @@ void (*ObjectTraits<struct wp_presentation_feedback>::deleter)(
 
 const wl_interface* ObjectTraits<xdg_shell>::interface = &xdg_shell_interface;
 void (*ObjectTraits<xdg_shell>::deleter)(xdg_shell*) = &xdg_shell_destroy;
+
+const wl_interface* ObjectTraits<agl_shell>::interface = &agl_shell_interface;
+void (*ObjectTraits<agl_shell>::deleter)(agl_shell*) = &agl_shell_destroy;
 
 const wl_interface* ObjectTraits<xdg_surface>::interface =
     &xdg_surface_interface;
