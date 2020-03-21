@@ -385,6 +385,28 @@ void WebAppWindow::SetWindowSurfaceId(int surface_id) {
   host_->SetWindowSurfaceId(surface_id);
 }
 
+void
+WebAppWindow::SetAglBackground()
+{
+	if (!host_)
+		return;
+}
+
+void
+WebAppWindow::SetAglReady()
+{
+	if (!host_)
+		return;
+}
+
+void
+WebAppWindow::SetAglPanel(int edge)
+{
+	if (!host_)
+		return;
+}
+
+
 void WebAppWindow::Show() {
   widget_->Show();
 }

@@ -74,6 +74,9 @@ class WebAppWindow : public views::NativeEventDelegate,
                        int hotspot_y);
   void SetWindowProperty(const std::string& name, const std::string& value);
   void SetWindowSurfaceId(int surface_id);
+  void SetAglBackground(void);
+  void SetAglReady(void);
+  void SetAglPanel(int edge);
   void Show();
   void Hide();
   void Minimize();

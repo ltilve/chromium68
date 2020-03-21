@@ -63,6 +63,10 @@ class APP_RUNTIME_EXPORT WebAppWindowBase : WebAppWindowDelegate {
     WidgetType type = WidgetType::kWindow;
     WindowShowState show_state = WindowShowState::kDefault;
     WebContents* web_contents = nullptr;
+
+    int pending_agl_edge_;
+    bool pending_agl_background_;
+    bool pending_agl_ready_;
   };
 
   WebAppWindowBase();
