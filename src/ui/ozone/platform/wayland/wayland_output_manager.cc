@@ -22,6 +22,16 @@ bool WaylandOutputManager::IsPrimaryOutputReady() const {
   return primary_output->is_ready();
 }
 
+WaylandOutput *
+WaylandOutputManager::GetPrimaryOutput()
+{
+	if (output_list_.empty())
+		return nullptr;
+
+	const auto &primary_output = output_list_.front();
+	return primary_output.get();
+}
+
 void WaylandOutputManager::AddWaylandOutput(const uint32_t output_id,
                                             wl_output* output) {
   // Make sure an output with |output_id| has not been added yet. It's very
