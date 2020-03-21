@@ -780,6 +780,24 @@ void WebAppWindow::InitWindow() {
 
   if (params_.show_state == app_runtime::WebAppWindowBase::CreateParams::WindowShowState::kFullscreen)
     widget_->SetFullscreen(true);
+
+  if (host_) {
+	  if (params_.pending_agl_background_) {
+		  LOG(INFO) << "params_.pending_agl_background_ is set";
+		  host_->SetAglBackground();
+	  }
+
+	  if (params_.pending_agl_ready_) {
+		  LOG(INFO) << "params_.pending_agl_ready is set";
+		  host_->SetAglReady();
+	  }
+
+	  if (params_.pending_agl_edge_ != -1) {
+		  LOG(INFO) << "params_.pending_agl_edge_ is set to " <<
+			  params_.pending_agl_edge_;
+		  host_->SetAglPanel(params_.pending_agl_edge_);
+	  }
+  }
 }
 
 void WebAppWindow::RecreateIfNeeded() {
