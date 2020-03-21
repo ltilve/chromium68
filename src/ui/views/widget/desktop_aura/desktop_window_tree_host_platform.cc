@@ -386,6 +386,22 @@ void DesktopWindowTreeHostPlatform::SetWindowSurfaceId(int surface_id) {
     pending_surface_id_ = surface_id;
 }
 
+void
+DesktopWindowTreeHostPlatform::SetAglPanel(int edge)
+{
+}
+
+void
+DesktopWindowTreeHostPlatform::SetAglBackground(void)
+{
+}
+
+void
+DesktopWindowTreeHostPlatform::SetAglReady(void)
+{
+}
+
+
 void DesktopWindowTreeHostPlatform::ClearNativeFocus() {
   // TODO: needs PlatformWindow support.
   NOTIMPLEMENTED_LOG_ONCE();
