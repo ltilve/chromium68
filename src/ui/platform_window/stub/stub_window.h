@@ -50,6 +50,9 @@ class STUB_WINDOW_EXPORT StubWindow : public PlatformWindow {
   void ConfineCursorToBounds(const gfx::Rect& bounds) override;
   PlatformImeController* GetPlatformImeController() override;
   void SetSurfaceId(int surface_id) override;
+  void SetAglBackground() override;
+  void SetAglPanel(int edge) override;
+  void SetAglReady() override;
   void SetRestoredBoundsInPixels(const gfx::Rect& bounds) override;
   gfx::Rect GetRestoredBoundsInPixels() const override;
 

@@ -16,6 +16,8 @@
 #include "ui/events/ozone/events_ozone.h"
 #include "ui/gfx/geometry/point_f.h"
 #include "ui/ozone/platform/wayland/wayland_connection.h"
+#include "ui/ozone/platform/wayland/wayland_output.h"
+#include "ui/ozone/platform/wayland/wayland_output_manager.h"
 #include "ui/ozone/platform/wayland/wayland_pointer.h"
 #include "ui/ozone/platform/wayland/xdg_popup_wrapper_v5.h"
 #include "ui/ozone/platform/wayland/xdg_popup_wrapper_v6.h"
@@ -463,6 +465,31 @@ void WaylandWindow::SetSurfaceId(int surface_id) {
   NOTREACHED() << "WaylandWindow gets the surface id from the "
     "PlatformWindowInitProperties passed to ::Initialize method";
 }
+
+void
+WaylandWindow::SetAglPanel(int edge)
+{
+	WaylandOutputManager *wayland_manager = connection_->wayland_output_manager();
+	WaylandOutput *output = wayland_manager->GetPrimaryOutput();
+
+	connection_->agl_shell_manager->setPanel(this, output, edge);
+}
+
+void
+WaylandWindow::SetAglBackground(void)
+{
+	WaylandOutputManager *wayland_manager = connection_->wayland_output_manager();
+	WaylandOutput *output = wayland_manager->GetPrimaryOutput();
+
+	connection_->agl_shell_manager->setBackGround(this, output);
+}
+
+void
+WaylandWindow::SetAglReady(void)
+{
+	connection_->agl_shell_manager->ready();
+}
+
   
 bool WaylandWindow::CanDispatchEvent(const PlatformEvent& event) {
   // This window is a nested popup window, all the events must be forwarded

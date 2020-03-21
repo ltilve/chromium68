@@ -75,6 +75,15 @@ void StubWindow::ConfineCursorToBounds(const gfx::Rect& bounds) {}
 void StubWindow::SetSurfaceId(int surface_id) {
 }
 
+void StubWindow::SetAglPanel(int edge) {
+}
+
+void StubWindow::SetAglBackground(void) {
+}
+
+void StubWindow::SetAglReady(void) {
+}
+
 PlatformImeController* StubWindow::GetPlatformImeController() {
   return nullptr;
 }

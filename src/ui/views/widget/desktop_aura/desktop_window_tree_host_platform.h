@@ -128,6 +128,10 @@ class VIEWS_EXPORT DesktopWindowTreeHostPlatform
   // Wayland and ivi_shell.  
   int pending_surface_id_ = 0;
 
+  int pending_agl_panel_edge_ = -1;
+  bool pending_agl_background_ = false;
+  bool pending_agl_ready_ = false;
+
   // A handler for events intended for non client area.
   std::unique_ptr<WindowEventFilter> non_client_window_event_filter_;
 
