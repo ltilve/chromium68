@@ -412,6 +412,14 @@ WebAppWindow::SetAglPanel(int edge)
 	host_->SetAglPanel(edge);
 }
 
+void
+WebAppWindow::SetAglActivateApp(std::string app)
+{
+	if (!host_)
+		return;
+
+	host_->SetAglActivateApp(app);
+}
 
 void WebAppWindow::Show() {
   widget_->Show();

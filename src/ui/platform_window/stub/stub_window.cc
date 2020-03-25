@@ -86,6 +86,9 @@ void StubWindow::SetAglBackground(void) {
 void StubWindow::SetAglReady(void) {
 }
 
+void StubWindow::SetAglActivateApp(std::string app) {
+}
+
 PlatformImeController* StubWindow::GetPlatformImeController() {
   return nullptr;
 }

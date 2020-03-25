@@ -422,6 +422,12 @@ DesktopWindowTreeHostPlatform::SetAglReady(void)
 		pending_agl_ready_ = true;
 }
 
+void
+DesktopWindowTreeHostPlatform::SetAglActivateApp(std::string app)
+{
+	if (platform_window())
+		platform_window()->SetAglActivateApp(app);
+}
 
 void DesktopWindowTreeHostPlatform::ClearNativeFocus() {
   // TODO: needs PlatformWindow support.

@@ -62,6 +62,7 @@ class PlatformWindow : public PropertyHandler {
   virtual void SetAglReady(void) = 0;
   virtual void SetAglBackground() = 0;
   virtual void SetAglPanel(int edge) = 0;
+  virtual void SetAglActivateApp(std::string app) = 0;
 
   virtual void SetCapture() = 0;
   virtual void ReleaseCapture() = 0;

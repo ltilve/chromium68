@@ -54,6 +54,7 @@ class STUB_WINDOW_EXPORT StubWindow : public PlatformWindow {
   void SetAglBackground() override;
   void SetAglPanel(int edge) override;
   void SetAglReady() override;
+  void SetAglActivateApp(std::string app) override;
   void SetRestoredBoundsInPixels(const gfx::Rect& bounds) override;
   gfx::Rect GetRestoredBoundsInPixels() const override;
 
