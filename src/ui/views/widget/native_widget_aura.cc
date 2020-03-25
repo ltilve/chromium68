@@ -425,6 +425,11 @@ bool NativeWidgetAura::SetWindowTitle(const base::string16& title) {
   return true;
 }
 
+bool NativeWidgetAura::SetAglAppId(const base::string16& title) {
+  NOTIMPLEMENTED_LOG_ONCE();
+  return false;
+}
+
 void NativeWidgetAura::SetWindowIcons(const gfx::ImageSkia& window_icon,
                                       const gfx::ImageSkia& app_icon) {
   if (!is_parallel_widget_in_window_manager_)

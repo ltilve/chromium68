@@ -675,6 +675,12 @@ void WebAppWindow::SetWindowTitle(const base::string16& title) {
     widget_->UpdateWindowTitle();
 }
 
+void WebAppWindow::SetAglAppId(const base::string16& title) {
+  app_id_ = title;
+  if (widget_)
+    widget_->SetAglAppId(title);
+}
+
 base::string16 WebAppWindow::GetWindowTitle() const {
   return title_;
 }

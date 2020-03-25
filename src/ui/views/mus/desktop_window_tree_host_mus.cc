@@ -646,6 +646,11 @@ bool DesktopWindowTreeHostMus::SetWindowTitle(const base::string16& title) {
   return true;
 }
 
+bool DesktopWindowTreeHostMus::SetAglAppId(const base::string16& title) {
+	NOTIMPLEMENTED_LOG_ONCE();
+	return false;
+}
+
 void DesktopWindowTreeHostMus::ClearNativeFocus() {
   aura::client::FocusClient* client = aura::client::GetFocusClient(window());
   if (client && window()->Contains(client->GetFocusedWindow()))

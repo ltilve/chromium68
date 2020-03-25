@@ -379,6 +379,15 @@ bool DesktopWindowTreeHostPlatform::SetWindowTitle(
   return false;
 }
 
+bool
+DesktopWindowTreeHostPlatform::SetAglAppId(const base::string16& title)
+{
+	if (platform_window())
+		platform_window()->SetAppId(title);
+
+	return true;
+}
+
 void DesktopWindowTreeHostPlatform::SetWindowSurfaceId(int surface_id) {
   if (platform_window())
     platform_window()->SetSurfaceId(surface_id);

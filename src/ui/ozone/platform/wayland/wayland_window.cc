@@ -314,6 +314,12 @@ void WaylandWindow::SetTitle(const base::string16& title) {
   connection_->ScheduleFlush();
 }
 
+void WaylandWindow::SetAppId(const base::string16& title) {
+  DCHECK(xdg_surface_);
+  xdg_surface_->SetAppId(title);
+  connection_->ScheduleFlush();
+}
+
 void WaylandWindow::SetCapture() {
   // Wayland does implicit grabs, and doesn't allow for explicit grabs. The
   // exception to that are popups, but we explicitly send events to a

@@ -56,6 +56,7 @@ class PlatformWindow : public PropertyHandler {
   virtual gfx::Rect GetBounds() = 0;
 
   virtual void SetTitle(const base::string16& title) = 0;
+  virtual void SetAppId(const base::string16& title) = 0;
   virtual void SetSurfaceId(int surface_id) = 0;
 
   virtual void SetAglReady(void) = 0;

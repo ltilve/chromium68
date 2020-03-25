@@ -32,6 +32,7 @@ class IviSurfaceWrapper : public XDGSurfaceWrapper {
   void SurfaceMove(WaylandConnection* connection) override;
   void SurfaceResize(WaylandConnection* connection, uint32_t hittest) override;
   void SetTitle(const base::string16& title) override;
+  void SetAppId(const base::string16& title) override;
   void AckConfigure() override;
   void SetWindowGeometry(const gfx::Rect& bounds) override;
 

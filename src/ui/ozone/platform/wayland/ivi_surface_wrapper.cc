@@ -76,6 +76,10 @@ void IviSurfaceWrapper::SetTitle(const base::string16& title) {
   NOTIMPLEMENTED_LOG_ONCE();
 }
 
+void IviSurfaceWrapper::SetAppId(const base::string16& title) {
+  NOTIMPLEMENTED_LOG_ONCE();
+}
+
 void IviSurfaceWrapper::AckConfigure() {
   NOTIMPLEMENTED_LOG_ONCE();
 }
