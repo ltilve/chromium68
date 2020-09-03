@@ -19,6 +19,7 @@ struct wl_output;
 
 namespace ui {
 
+class WaylandConnection;
 class WaylandOutput;
 
 class WaylandOutputManager : public WaylandOutput::Delegate {
@@ -34,7 +35,8 @@ class WaylandOutputManager : public WaylandOutput::Delegate {
   void RemoveWaylandOutput(const uint32_t output_id);
 
   // Creates a platform screen and feeds it with existing outputs.
-  std::unique_ptr<WaylandScreen> CreateWaylandScreen();
+  std::unique_ptr<WaylandScreen> CreateWaylandScreen(
+      WaylandConnection* connection);
 
   // Updates metrics for the primary output. It's only for AGL.
   void HandleMetricsForPrimaryOutput(const gfx::Rect& new_bounds);
