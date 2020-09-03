@@ -41,6 +41,8 @@ class WaylandOutputManager : public WaylandOutput::Delegate {
   // Updates metrics for the primary output. It's only for AGL.
   void HandleMetricsForPrimaryOutput(const gfx::Rect& new_bounds);
 
+  uint32_t GetIdForOutput(wl_output* output) const;
+
  private:
   void OnWaylandOutputAdded(uint32_t output_id);
   void OnWaylandOutputRemoved(uint32_t output_id);
