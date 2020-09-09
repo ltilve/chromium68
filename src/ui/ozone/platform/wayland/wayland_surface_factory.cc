@@ -33,7 +33,8 @@ static void DeleteSharedMemory(void* pixels, void* context) {
   delete static_cast<base::SharedMemory*>(context);
 }
 
-class WaylandCanvasSurface : public SurfaceOzoneCanvas {
+class WaylandCanvasSurface : public SurfaceOzoneCanvas,
+                             public WaylandWindow::Observer {
  public:
   WaylandCanvasSurface(WaylandConnectionProxy* connection,
                        WaylandWindow* window_);
@@ -45,6 +46,10 @@ class WaylandCanvasSurface : public SurfaceOzoneCanvas {
   void PresentCanvas(const gfx::Rect& damage) override;
   std::unique_ptr<gfx::VSyncProvider> CreateVSyncProvider() override;
 
+  // WaylandWindow::Observer
+  void OnConfigureRequest() override;
+  void OnConfigureRequestAck() override;
+
  private:
   WaylandConnectionProxy* connection_;
   WaylandWindow* window_;
@@ -54,6 +59,9 @@ class WaylandCanvasSurface : public SurfaceOzoneCanvas {
   wl::Object<wl_shm_pool> pool_;
   wl::Object<wl_buffer> buffer_;
 
+  gfx::Rect pending_damage_;
+  bool waiting_configure_ack_ = true;
+
   DISALLOW_COPY_AND_ASSIGN(WaylandCanvasSurface);
 };
 
@@ -61,9 +69,13 @@ WaylandCanvasSurface::WaylandCanvasSurface(WaylandConnectionProxy* connection,
                                            WaylandWindow* window)
     : connection_(connection),
       window_(window),
-      size_(window->GetBounds().size()) {}
+      size_(window->GetBounds().size()) {
+  window->AddObserver(this);
+}
 
-WaylandCanvasSurface::~WaylandCanvasSurface() {}
+WaylandCanvasSurface::~WaylandCanvasSurface() {
+  window_->RemoveObserver(this);
+}
 
 sk_sp<SkSurface> WaylandCanvasSurface::GetSurface() {
   if (sk_surface_)
@@ -112,6 +124,10 @@ void WaylandCanvasSurface::ResizeCanvas(const gfx::Size& viewport_size) {
 }
 
 void WaylandCanvasSurface::PresentCanvas(const gfx::Rect& damage) {
+  if (waiting_configure_ack_) {
+    pending_damage_.Union(damage);
+    return;
+  }
   // TODO(forney): This is just a naive implementation that allows chromium to
   // draw to the buffer at any time, even if it is being used by the Wayland
   // compositor. Instead, we should track buffer releases and frame callbacks
@@ -122,6 +138,18 @@ void WaylandCanvasSurface::PresentCanvas(const gfx::Rect& damage) {
   wl_surface_attach(surface, buffer_.get(), 0, 0);
   wl_surface_commit(surface);
   connection_->ScheduleFlush();
+}
+
+void WaylandCanvasSurface::OnConfigureRequest() {
+  waiting_configure_ack_ = true;
+}
+
+void WaylandCanvasSurface::OnConfigureRequestAck() {
+  waiting_configure_ack_ = false;
+  if (!pending_damage_.IsEmpty()) {
+    PresentCanvas(pending_damage_);
+    pending_damage_ = gfx::Rect();
+  }
 }
 
 std::unique_ptr<gfx::VSyncProvider>

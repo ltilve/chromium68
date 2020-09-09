@@ -10,6 +10,7 @@
 
 #include "base/callback.h"
 #include "base/memory/ref_counted.h"
+#include "base/observer_list.h"
 #include "ui/events/platform/platform_event_dispatcher.h"
 #include "ui/gfx/geometry/rect.h"
 #include "ui/gfx/native_widget_types.h"
@@ -42,6 +43,12 @@ class WaylandWindow : public PlatformWindow,
                       public WmMoveResizeHandler,
                       public WmDragHandler {
  public:
+  class Observer {
+   public:
+    virtual void OnConfigureRequest() {}
+    virtual void OnConfigureRequestAck() {}
+  };
+
   WaylandWindow(PlatformWindowDelegate* delegate,
                 WaylandConnection* connection);
   ~WaylandWindow() override;
@@ -90,6 +97,9 @@ class WaylandWindow : public PlatformWindow,
   bool is_active() const { return is_active_; }
 
   int surface_id() const { return surface_id_; }
+
+  void AddObserver(Observer* observer);
+  void RemoveObserver(Observer* observer);
 
   // WmMoveResizeHandler
   void DispatchHostWindowDragMovement(
@@ -239,6 +249,8 @@ class WaylandWindow : public PlatformWindow,
 
   // Stores the list of entered outputs that the window is currently in.
   std::set<uint32_t> entered_outputs_ids_;
+
+  base::ObserverList<Observer> observers_;
 
   DISALLOW_COPY_AND_ASSIGN(WaylandWindow);
 };

@@ -231,6 +231,9 @@ void WaylandWindow::ApplyPendingBounds() {
   xdg_surface_->SetWindowGeometry(bounds_);
   xdg_surface_->AckConfigure();
   pending_bounds_ = gfx::Rect();
+  for (Observer& observer : observers_) {
+    observer.OnConfigureRequestAck();
+  }
   connection_->ScheduleFlush();
 }
 
@@ -635,6 +638,10 @@ void WaylandWindow::HandleSurfaceConfigure(int32_t width,
   if (did_active_change)
     delegate_->OnActivationChanged(is_active_);
 
+  for (Observer& observer : observers_) {
+    observer.OnConfigureRequest();
+  }
+
   MaybeTriggerPendingStateChange();
 }
 
@@ -782,6 +789,18 @@ void WaylandWindow::Leave(void* data,
     DCHECK(window->surface_.get() == wl_surface);
     window->RemoveEnteredOutputId(output);
   }
+}
+
+void WaylandWindow::AddObserver(Observer* observer) {
+  observers_.AddObserver(observer);
+
+  // Notify a configure request is pending so surfaces are not commited.
+  if (!pending_bounds_.IsEmpty())
+    observer->OnConfigureRequest();
+}
+
+void WaylandWindow::RemoveObserver(Observer* observer) {
+  observers_.RemoveObserver(observer);
 }
 
 }  // namespace ui
