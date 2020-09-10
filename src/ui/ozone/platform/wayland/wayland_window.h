@@ -69,6 +69,8 @@ class WaylandWindow : public PlatformWindow,
   // compositor side or it has been moved due to unplug action (check the
   // comment in RemoveEnteredOutputId).
   std::set<uint32_t> GetEnteredOutputsIds() const;
+  bool is_configured() const { return configured_; }
+  void reset_configured() { configured_ = false; }
 
   // Apply the bounds specified in the most recent configure event. This should
   // be called after processing all pending events in the wayland connection.
@@ -168,6 +170,8 @@ class WaylandWindow : public PlatformWindow,
   bool IsFullscreen() const;
 
   void MaybeTriggerPendingStateChange();
+
+  bool configured_;
 
   // Creates a popup window, which is visible as a menu window.
   void CreateXdgPopup();

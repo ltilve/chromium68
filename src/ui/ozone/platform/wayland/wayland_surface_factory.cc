@@ -132,6 +132,13 @@ void WaylandCanvasSurface::PresentCanvas(const gfx::Rect& damage) {
   // draw to the buffer at any time, even if it is being used by the Wayland
   // compositor. Instead, we should track buffer releases and frame callbacks
   // from Wayland to ensure perfect frames (while minimizing copies).
+
+  // verify here if the we have the configure event, and skip otherwise */
+  if (!window_->is_configured()) {
+	  LOG(INFO) << "WaylandCanvasSurface::PresentCanvas(), skipping attaching the buffer";
+	  return;
+  }
+
   wl_surface* surface = window_->surface();
   wl_surface_damage(surface, damage.x(), damage.y(), damage.width(),
                     damage.height());

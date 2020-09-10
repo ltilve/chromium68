@@ -82,7 +82,7 @@ gfx::Rect TranslateBoundsToParentCoordinates(const gfx::Rect& child_bounds,
 WaylandWindow::WaylandWindow(PlatformWindowDelegate* delegate,
                              WaylandConnection* connection)
     : delegate_(delegate),
-      connection_(connection),
+      connection_(connection), configured_(false),
       xdg_shell_objects_factory_(new XDGShellObjectFactory()),
       state_(PlatformWindowState::PLATFORM_WINDOW_STATE_NORMAL),
       pending_state_(PlatformWindowState::PLATFORM_WINDOW_STATE_UNKNOWN) {
@@ -226,6 +226,7 @@ void WaylandWindow::ApplyPendingBounds() {
   if (pending_bounds_.IsEmpty())
     return;
 
+
   SetBounds(pending_bounds_);
   DCHECK(xdg_surface_);
   xdg_surface_->SetWindowGeometry(bounds_);
@@ -234,6 +235,7 @@ void WaylandWindow::ApplyPendingBounds() {
   for (Observer& observer : observers_) {
     observer.OnConfigureRequestAck();
   }
+  configured_ = true;
   connection_->ScheduleFlush();
 }
 
@@ -493,6 +495,8 @@ WaylandWindow::SetAglPanel(int edge)
 	WaylandOutput *output = wayland_manager->GetPrimaryOutput();
 
 	connection_->agl_shell_manager->setPanel(this, output, edge);
+	/* force a flush to send it, otherwise the request is not be sent */
+	connection_->ScheduleFlush();
 }
 
 void
@@ -513,12 +517,16 @@ WaylandWindow::SetAglBackground(void)
 	WaylandOutput *output = wayland_manager->GetPrimaryOutput();
 
 	connection_->agl_shell_manager->setBackGround(this, output);
+	/* force a flush to send it, otherwise the request is not be sent */
+	connection_->ScheduleFlush();
 }
 
 void
 WaylandWindow::SetAglReady(void)
 {
 	connection_->agl_shell_manager->ready();
+	/* force a flush to send it, otherwise the request is not be sent */
+	connection_->ScheduleFlush();
 }
 
   
@@ -629,6 +637,7 @@ void WaylandWindow::HandleSurfaceConfigure(int32_t width,
 
   const bool is_normal = !IsFullscreen() && !IsMaximized();
   const bool state_changed = old_state != state_;
+
   if (is_normal && state_changed)
     restored_bounds_ = gfx::Rect();
 
@@ -640,6 +649,11 @@ void WaylandWindow::HandleSurfaceConfigure(int32_t width,
 
   for (Observer& observer : observers_) {
     observer.OnConfigureRequest();
+  }
+
+  // reset configured_
+  if (configured_ == true) {
+	  configured_ = false;
   }
 
   MaybeTriggerPendingStateChange();
